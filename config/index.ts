@@ -14,4 +14,10 @@ export const applicationConfig = {
     password: process.env.DB_PASSWORD,
     name: process.env.DB_NAME,
   },
+
+  jwt: {
+    secret: process.env.JWT_SECRET || 'speer-secret',
+    expiresIn: '24h',
+    issuer: 'speer',
+  },
 };
