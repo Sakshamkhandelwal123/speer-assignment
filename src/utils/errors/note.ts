@@ -35,3 +35,15 @@ export class NoteDeleteError extends HttpException {
     );
   }
 }
+
+export class NoteShareError extends HttpException {
+  constructor() {
+    super(
+      {
+        message: 'You cannot share this note',
+        code: 'NOTE_SHARE',
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}

@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common';
 import { get } from 'lodash';
+import { Logger } from '@nestjs/common';
 
 export const getErrorCodeAndMessage = (
   error: unknown,

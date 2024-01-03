@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     NotesModule,
     UsersModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

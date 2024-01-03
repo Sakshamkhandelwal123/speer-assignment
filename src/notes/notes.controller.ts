@@ -11,20 +11,26 @@ import {
 } from '@nestjs/common';
 
 import { NotesService } from './notes.service';
+import { ShareNoteDto } from './dto/share-note.dto';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
-import { CurrentUser } from 'src/auth/decorators/currentUser';
 import { User } from 'src/users/entities/user.entity';
 import { getErrorCodeAndMessage } from 'src/utils/helpers';
+import { SharedNotesService } from './shared-notes.service';
+import { CurrentUser } from 'src/auth/decorators/currentUser';
 import {
   NoteDeleteError,
   NoteNotFoundError,
+  NoteShareError,
   NoteUpdateError,
 } from 'src/utils/errors/note';
 
 @Controller('api/notes')
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(
+    private readonly notesService: NotesService,
+    private readonly sharedNotesService: SharedNotesService,
+  ) {}
 
   @Post()
   create(
@@ -38,6 +44,37 @@ export class NotesController {
       };
 
       return this.notesService.create(payload);
+    } catch (error) {
+      throw new HttpException(
+        getErrorCodeAndMessage(error),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post(':id/share')
+  async shareNote(
+    @CurrentUser() currentUser: User,
+    @Param('id') id: string,
+    @Body() shareNoteDto: ShareNoteDto,
+  ) {
+    try {
+      const note = await this.notesService.findOne({
+        id,
+        createdBy: currentUser.id,
+      });
+
+      if (!note) {
+        throw new NoteShareError();
+      }
+
+      await this.sharedNotesService.create({
+        noteId: id,
+        ownerId: currentUser.id,
+        sharedUserId: shareNoteDto.sharedUserId,
+      });
+
+      return 'Note shared successfully';
     } catch (error) {
       throw new HttpException(
         getErrorCodeAndMessage(error),
