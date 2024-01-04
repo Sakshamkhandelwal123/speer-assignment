@@ -8,9 +8,12 @@ import {
 } from '@nestjs/common';
 import { compare } from 'bcryptjs';
 import { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
 
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from './users.service';
+import { RATE_LIMITER } from 'src/utils/constants';
+import { Public } from 'src/auth/decorators/public';
 import { CreateUserDto } from './dto/create-user.dto';
 import { getErrorCodeAndMessage } from 'src/utils/helpers';
 import {
@@ -23,7 +26,12 @@ import {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post('signup')
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async signup(@Body() createUserDto: CreateUserDto) {
     try {
       const { email } = createUserDto;
@@ -45,7 +53,12 @@ export class UsersController {
     }
   }
 
+  @Public()
   @Post('login')
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     try {
       const { email, password } = loginDto;
@@ -77,7 +90,7 @@ export class UsersController {
         expiresIn: jwtToken.expiresIn,
       };
 
-      return response;
+      return res.status(200).send(response);
     } catch (error) {
       throw new HttpException(
         getErrorCodeAndMessage(error),

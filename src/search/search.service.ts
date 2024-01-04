@@ -143,11 +143,19 @@ export class SearchService {
 
   async getSearchResult(
     keyword: string,
+    userId: string,
     limit = 10,
     offset = 0,
   ): Promise<SearchResponse<any>> {
     const meiliIndex = this.MeiliIndex['NOTE'];
     const index = this.client.index(meiliIndex);
-    return index.search(keyword, { limit, offset });
+
+    index.updateFilterableAttributes(['createdBy']);
+
+    return index.search(keyword, {
+      limit,
+      offset,
+      filter: [`createdBy = ${userId}`],
+    });
   }
 }

@@ -26,7 +26,8 @@ import {
   ReadPermissionError,
 } from 'src/utils/errors/note';
 import { SearchService } from 'src/search/search.service';
-import { searchAction } from 'src/utils/constants';
+import { RATE_LIMITER, searchAction } from 'src/utils/constants';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('api/notes')
 export class NotesController {
@@ -37,6 +38,10 @@ export class NotesController {
   ) {}
 
   @Post()
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async create(
     @CurrentUser() currentUser: User,
     @Body() createNoteDto: CreateNoteDto,
@@ -64,6 +69,10 @@ export class NotesController {
   }
 
   @Post(':id/share')
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async shareNote(
     @CurrentUser() currentUser: User,
     @Param('id') id: string,
@@ -95,6 +104,7 @@ export class NotesController {
   }
 
   @Get()
+  @Throttle(RATE_LIMITER.MAX_GET_RATE_LIMIT, RATE_LIMITER.MAX_GET_RATE_DURATION)
   findAll(@CurrentUser() currentUser: User) {
     try {
       return this.notesService.findAll({ createdBy: currentUser.id });
@@ -107,6 +117,7 @@ export class NotesController {
   }
 
   @Get(':id')
+  @Throttle(RATE_LIMITER.MAX_GET_RATE_LIMIT, RATE_LIMITER.MAX_GET_RATE_DURATION)
   async findOne(@CurrentUser() currentUser: User, @Param('id') id: string) {
     try {
       const note = await this.notesService.findOne({
@@ -137,6 +148,10 @@ export class NotesController {
   }
 
   @Put(':id')
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async update(
     @CurrentUser() currentUser: User,
     @Param('id') id: string,
@@ -154,6 +169,11 @@ export class NotesController {
 
       const updatedNote = await this.notesService.update(id, updateNoteDto);
 
+      await this.searchService.addUpdateSearch(
+        updatedNote[1][0],
+        searchAction.ADD_UPDATE_NOTE,
+      );
+
       return updatedNote[1][0];
     } catch (error) {
       throw new HttpException(
@@ -164,6 +184,10 @@ export class NotesController {
   }
 
   @Delete(':id')
+  @Throttle(
+    RATE_LIMITER.MAX_POST_RATE_LIMIT,
+    RATE_LIMITER.MAX_POST_RATE_DURATION,
+  )
   async remove(@CurrentUser() currentUser: User, @Param('id') id: string) {
     try {
       const note = await this.notesService.findOne({

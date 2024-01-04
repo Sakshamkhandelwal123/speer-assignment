@@ -14,6 +14,11 @@ import { UsersModule } from './users/users.module';
 import { QueueModule } from './queue/queue.module';
 import { SearchModule } from './search/search.module';
 import { CommonModule } from './common/common.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { rateLimit } from './utils/constants';
+import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -39,6 +44,10 @@ import { CommonModule } from './common/common.module';
       autoLoadModels: true,
       synchronize: false,
     }),
+    ThrottlerModule.forRoot({
+      ttl: rateLimit.ttl,
+      limit: rateLimit.limit,
+    }),
     BullModule.forRoot({
       redis: {
         host: applicationConfig.redis.host || 'localhost',
@@ -46,13 +55,20 @@ import { CommonModule } from './common/common.module';
       },
     }),
     AuthModule,
-    NotesModule,
     UsersModule,
+    NotesModule,
     SearchModule,
     CommonModule,
     QueueModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -61,7 +61,7 @@ export class MeilisearchQueueProcessor {
 
   async sendNoteData(actionData: Note) {
     try {
-      const note = await this.notesService.findOne(actionData.id);
+      const note = await this.notesService.findOne({ id: actionData.id });
 
       if (note) {
         const index = this.searchService.client.index(
