@@ -41,6 +41,9 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+# test mode
+$ npm run test
 ```
 
 ## Environment Variables

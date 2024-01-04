@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { JwtPayload, decode, sign } from 'jsonwebtoken';
 
-import { applicationConfig } from 'config';
+import { applicationConfig } from '../../config';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { generateUsername } from 'src/utils/username-generator';
-import { validatePasswordStrength } from 'src/utils/validation-checks';
+import { generateUsername } from '../utils/username-generator';
+import { validatePasswordStrength } from '../utils/validation-checks';
 
 @Injectable()
 export class UsersService {

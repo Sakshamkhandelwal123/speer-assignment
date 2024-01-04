@@ -12,15 +12,15 @@ import { Throttle } from '@nestjs/throttler';
 
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from './users.service';
-import { RATE_LIMITER } from 'src/utils/constants';
-import { Public } from 'src/auth/decorators/public';
+import { RATE_LIMITER } from '../utils/constants';
+import { Public } from '../auth/decorators/public';
 import { CreateUserDto } from './dto/create-user.dto';
-import { getErrorCodeAndMessage } from 'src/utils/helpers';
+import { getErrorCodeAndMessage } from '../utils/helpers';
 import {
   InvalidUserError,
   UserAlreadyExistError,
   WrongPasswordError,
-} from 'src/utils/errors/user';
+} from '../utils/errors/user';
 
 @Controller('api/auth')
 export class UsersController {
