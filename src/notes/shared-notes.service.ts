@@ -13,4 +13,11 @@ export class SharedNotesService {
   create(payload = {}) {
     return this.sharedNoteModel.create(payload);
   }
+
+  findOne(condition = {}, options = {}) {
+    return this.sharedNoteModel.findOne({
+      where: condition,
+      ...options,
+    });
+  }
 }

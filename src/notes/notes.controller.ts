@@ -23,17 +23,21 @@ import {
   NoteNotFoundError,
   NoteShareError,
   NoteUpdateError,
+  ReadPermissionError,
 } from 'src/utils/errors/note';
+import { SearchService } from 'src/search/search.service';
+import { searchAction } from 'src/utils/constants';
 
 @Controller('api/notes')
 export class NotesController {
   constructor(
+    private readonly searchService: SearchService,
     private readonly notesService: NotesService,
     private readonly sharedNotesService: SharedNotesService,
   ) {}
 
   @Post()
-  create(
+  async create(
     @CurrentUser() currentUser: User,
     @Body() createNoteDto: CreateNoteDto,
   ) {
@@ -43,7 +47,14 @@ export class NotesController {
         ...createNoteDto,
       };
 
-      return this.notesService.create(payload);
+      const newNote = await this.notesService.create(payload);
+
+      await this.searchService.addUpdateSearch(
+        newNote,
+        searchAction.ADD_UPDATE_NOTE,
+      );
+
+      return newNote;
     } catch (error) {
       throw new HttpException(
         getErrorCodeAndMessage(error),
@@ -100,11 +111,20 @@ export class NotesController {
     try {
       const note = await this.notesService.findOne({
         id,
-        createdBy: currentUser.id,
       });
 
       if (!note) {
         throw new NoteNotFoundError();
+      }
+
+      if (note.createdBy !== currentUser.id) {
+        const isAccess = await this.sharedNotesService.findOne({
+          sharedUserId: currentUser.id,
+        });
+
+        if (!isAccess) {
+          throw new ReadPermissionError();
+        }
       }
 
       return note;
@@ -156,6 +176,8 @@ export class NotesController {
       }
 
       await this.notesService.remove(id);
+
+      await this.searchService.deleteSearch(id, searchAction.DELETE_NOTE);
 
       return 'Note deleted successfully';
     } catch (error) {

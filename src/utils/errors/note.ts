@@ -47,3 +47,15 @@ export class NoteShareError extends HttpException {
     );
   }
 }
+
+export class ReadPermissionError extends HttpException {
+  constructor() {
+    super(
+      {
+        message: 'You do not have the permission to read this note',
+        code: 'READ_PERMISSION',
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}

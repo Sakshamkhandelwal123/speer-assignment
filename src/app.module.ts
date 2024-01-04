@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 import { Dialect } from 'sequelize';
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bull';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
@@ -10,7 +11,9 @@ import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
+import { QueueModule } from './queue/queue.module';
 import { SearchModule } from './search/search.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -36,10 +39,18 @@ import { SearchModule } from './search/search.module';
       autoLoadModels: true,
       synchronize: false,
     }),
+    BullModule.forRoot({
+      redis: {
+        host: applicationConfig.redis.host || 'localhost',
+        port: parseInt(applicationConfig.redis.port, 10) || 6379,
+      },
+    }),
     AuthModule,
     NotesModule,
     UsersModule,
     SearchModule,
+    CommonModule,
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

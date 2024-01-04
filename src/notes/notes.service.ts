@@ -23,7 +23,7 @@ export class NotesService {
   }
 
   findOne(condition = {}, options = {}) {
-    return this.noteModel.findAll({
+    return this.noteModel.findOne({
       where: condition,
       ...options,
     });

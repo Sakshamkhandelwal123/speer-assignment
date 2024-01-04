@@ -18,3 +18,6 @@ export const getErrorCodeAndMessage = (
     ),
   };
 };
+
+export const getMeilliSearchJobId = (actionName: string, id: string) =>
+  `MEILLISEARCH_${actionName}_${id}`;

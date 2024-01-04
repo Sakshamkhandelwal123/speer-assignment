@@ -20,4 +20,14 @@ export const applicationConfig = {
     expiresIn: '24h',
     issuer: 'speer',
   },
+
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
+
+  meiliSearch: {
+    host: process.env.MEILISEARCH_HOST,
+    apikey: process.env.MEILI_MASTER_KEY,
+  },
 };
