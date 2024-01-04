@@ -20,4 +20,10 @@ export class SharedNotesService {
       ...options,
     });
   }
+
+  remove(condition = {}) {
+    return this.sharedNoteModel.destroy({
+      where: condition,
+    });
+  }
 }

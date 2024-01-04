@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import { Note } from './entities/note.entity';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { SharedNotesService } from './shared-notes.service';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectModel(Note)
     private readonly noteModel: typeof Note,
+
+    private readonly sharedNotesService: SharedNotesService,
   ) {}
 
   create(payload = {}) {
@@ -38,11 +41,15 @@ export class NotesService {
     });
   }
 
-  remove(id: string) {
-    return this.noteModel.destroy({
+  async remove(id: string) {
+    const notes = await this.noteModel.destroy({
       where: {
         id,
       },
     });
+
+    await this.sharedNotesService.remove({ noteId: id });
+
+    return notes;
   }
 }

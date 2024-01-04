@@ -131,6 +131,7 @@ export class NotesController {
       if (note.createdBy !== currentUser.id) {
         const isAccess = await this.sharedNotesService.findOne({
           sharedUserId: currentUser.id,
+          noteId: id,
         });
 
         if (!isAccess) {

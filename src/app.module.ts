@@ -1,24 +1,24 @@
 import * as Joi from 'joi';
 import { Dialect } from 'sequelize';
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { applicationConfig } from 'config';
 import { AppService } from './app.service';
+import { rateLimit } from './utils/constants';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
 import { QueueModule } from './queue/queue.module';
+import { AuthGuard } from './auth/guards/auth.guard';
 import { SearchModule } from './search/search.module';
 import { CommonModule } from './common/common.module';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { rateLimit } from './utils/constants';
-import { JwtService } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -65,6 +65,10 @@ import { AuthGuard } from './auth/guards/auth.guard';
   providers: [
     AppService,
     JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
