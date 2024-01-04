@@ -17,6 +17,17 @@ To install the dependencies for this project, run the following command:
 $ npm install
 ```
 
+## Installation(Setup files)
+
+Download and Install meilisearch from this website :-  
+[https://www.meilisearch.com/docs/learn/getting_started/installation](https://www.meilisearch.com/docs/learn/getting_started/installation)
+
+Run meilisearch by following command :-
+
+```
+./meilisearch
+```
+
 ## Running the application
 
 To start the application run the following command:
